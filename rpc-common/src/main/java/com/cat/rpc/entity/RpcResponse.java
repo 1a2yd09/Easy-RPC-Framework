@@ -1,6 +1,6 @@
 package com.cat.rpc.entity;
 
-import enumeration.ResponseCode;
+import com.cat.rpc.enumeration.ResponseCode;
 import lombok.Data;
 
 import java.io.Serializable;
