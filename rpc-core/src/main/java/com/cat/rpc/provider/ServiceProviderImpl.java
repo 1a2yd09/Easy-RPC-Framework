@@ -1,4 +1,4 @@
-package com.cat.rpc.registry;
+package com.cat.rpc.provider;
 
 import com.cat.rpc.enumeration.RpcError;
 import com.cat.rpc.exception.RpcException;
@@ -9,14 +9,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultServiceRegistry implements ServiceRegistry {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceRegistry.class);
-
+public class ServiceProviderImpl implements ServiceProvider {
+    private static final Logger logger = LoggerFactory.getLogger(ServiceProviderImpl.class);
+    /**
+     * 注册服务名及服务实例，用 Map 实现表明某个接口只能有一个对象提供服务。
+     */
     private static final Map<String, Object> serviceMap = new ConcurrentHashMap<>();
+    /**
+     * 已注册服务。
+     */
     private static final Set<String> registeredService = ConcurrentHashMap.newKeySet();
 
     @Override
-    public synchronized <T> void register(T service) {
+    public <T> void addServiceProvider(T service) {
+        // com.cat.test.HelloServiceImpl
         String serviceName = service.getClass().getCanonicalName();
         if (registeredService.contains(serviceName)) {
             return;
@@ -33,7 +39,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
     }
 
     @Override
-    public Object getService(String serviceName) {
+    public Object getServiceProvider(String serviceName) {
         Object service = serviceMap.get(serviceName);
         if (service == null) {
             throw new RpcException(RpcError.SERVICE_NOT_FOUND);
