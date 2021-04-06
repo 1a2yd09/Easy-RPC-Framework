@@ -1,55 +1,24 @@
 package com.cat.rpc.registry;
 
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingFactory;
-import com.alibaba.nacos.api.naming.NamingService;
-import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.cat.rpc.enumeration.RpcError;
 import com.cat.rpc.exception.RpcException;
+import com.cat.rpc.util.NacosUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 
 public class NacosServiceRegistry implements ServiceRegistry {
     private static final Logger logger = LoggerFactory.getLogger(NacosServiceRegistry.class);
 
-    private static final String SERVER_ADDR = "127.0.0.1:8848";
-    private static final NamingService namingService;
-
-    static {
-        try {
-            namingService = NamingFactory.createNamingService(SERVER_ADDR);
-        } catch (NacosException e) {
-            logger.error("连接到Nacos时有错误发生: ", e);
-            throw new RpcException(RpcError.FAILED_TO_CONNECT_TO_SERVICE_REGISTRY);
-        }
-    }
-
     @Override
     public void register(String serviceName, InetSocketAddress inetSocketAddress) {
         try {
-            // 服务提供者向注册中心注册服务，由服务名、主机地址、端口确定当前服务提供者的服务路径:
-            namingService.registerInstance(serviceName, inetSocketAddress.getHostName(), inetSocketAddress.getPort());
+            NacosUtil.registerService(serviceName, inetSocketAddress);
         } catch (NacosException e) {
             logger.error("注册服务时有错误发生: ", e);
             throw new RpcException(RpcError.REGISTER_SERVICE_FAILED);
         }
-    }
-
-    @Override
-    public InetSocketAddress lookupService(String serviceName) {
-        try {
-            // 根据服务名获取所有的服务提供者实例:
-            List<Instance> instances = namingService.getAllInstances(serviceName);
-            // 默认选择首位服务提供者，返回其主机地址及端口号:
-            // TODO: 负载均衡实现
-            Instance instance = instances.get(0);
-            return new InetSocketAddress(instance.getIp(), instance.getPort());
-        } catch (NacosException e) {
-            logger.error("获取服务时有错误发生: ", e);
-        }
-        return null;
     }
 }

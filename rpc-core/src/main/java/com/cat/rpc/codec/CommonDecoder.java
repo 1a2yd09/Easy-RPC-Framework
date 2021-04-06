@@ -39,7 +39,7 @@ public class CommonDecoder extends ReplayingDecoder {
             throw new RpcException(RpcError.UNKNOWN_PACKAGE_TYPE);
         }
         int serializerCode = in.readInt();
-        // 根据协议中的序列化方式代码获取对应的解码器:
+        // 根据协议中的(反)序列化器代码获取对应的(反)序列化器:
         CommonSerializer serializer = CommonSerializer.getByCode(serializerCode);
         if (serializer == null) {
             logger.error("不识别的反序列化器: {}", serializerCode);

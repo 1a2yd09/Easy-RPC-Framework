@@ -16,6 +16,9 @@ public class ObjectReader {
     private static final Logger logger = LoggerFactory.getLogger(ObjectReader.class);
     private static final int MAGIC_NUMBER = 0xCAFEBABE;
 
+    /**
+     * 从 Socket 通信流中读取数据。
+     */
     public static Object readObject(InputStream in) throws IOException {
         byte[] numberBytes = new byte[4];
         in.read(numberBytes);

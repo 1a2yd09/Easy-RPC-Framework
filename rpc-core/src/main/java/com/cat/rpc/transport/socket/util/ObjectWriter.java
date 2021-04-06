@@ -10,6 +10,9 @@ import java.io.OutputStream;
 public class ObjectWriter {
     private static final int MAGIC_NUMBER = 0xCAFEBABE;
 
+    /**
+     * 向 Socket 通信输出流中写入数据。
+     */
     public static void writeObject(OutputStream outputStream, Object object, CommonSerializer serializer) throws IOException {
         outputStream.write(intToBytes(MAGIC_NUMBER));
         if (object instanceof RpcRequest) {

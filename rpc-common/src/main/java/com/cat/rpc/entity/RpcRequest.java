@@ -15,4 +15,5 @@ public class RpcRequest implements Serializable {
     private String methodName;
     private Class<?>[] paramTypes;
     private Object[] parameters;
+    private Boolean heartBeat;
 }
