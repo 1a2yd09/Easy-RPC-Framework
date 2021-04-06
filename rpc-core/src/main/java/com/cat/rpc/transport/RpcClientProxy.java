@@ -13,7 +13,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * RPC客户端动态代理。
@@ -46,12 +45,12 @@ public class RpcClientProxy implements InvocationHandler {
                 method.getName(), method.getParameterTypes(), args, false);
         RpcResponse rpcResponse = null;
         if (client instanceof NettyClient) {
-            // CompletableFuture 可以简单地理解为它就是一个数据的容器，在多个线程之间传递数据:
-            CompletableFuture<RpcResponse> completableFuture = (CompletableFuture<RpcResponse>) client.sendRequest(rpcRequest);
             try {
+                // CompletableFuture 可以简单地理解为它就是一个数据的容器，在多个线程之间传递数据:
+                CompletableFuture<RpcResponse> completableFuture = (CompletableFuture<RpcResponse>) client.sendRequest(rpcRequest);
                 // Netty 客户端在此处同步等待远程调用的结果返回:
                 rpcResponse = completableFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (Exception e) {
                 logger.error("方法调用请求发送失败", e);
                 return null;
             }
