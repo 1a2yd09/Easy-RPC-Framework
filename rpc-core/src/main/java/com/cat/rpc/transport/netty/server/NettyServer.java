@@ -2,6 +2,7 @@ package com.cat.rpc.transport.netty.server;
 
 import com.cat.rpc.codec.CommonDecoder;
 import com.cat.rpc.codec.CommonEncoder;
+import com.cat.rpc.codec.ProtocolFrameDecoder;
 import com.cat.rpc.hook.ShutdownHook;
 import com.cat.rpc.provider.ServiceProviderImpl;
 import com.cat.rpc.registry.NacosServiceRegistry;
@@ -53,6 +54,7 @@ public class NettyServer extends AbstractRpcServer {
                             ChannelPipeline pipeline = ch.pipeline();
                             // 如果30s内没有收到客户端的数据，会触发一个 IdleState#READER_IDLE 事件，事件处理方法在 NettyServerHandler 中:
                             pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS))
+                                    .addLast(new ProtocolFrameDecoder())
                                     .addLast(new CommonEncoder(serializer))
                                     .addLast(new CommonDecoder())
                                     .addLast(new NettyServerHandler());

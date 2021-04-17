@@ -2,6 +2,7 @@ package com.cat.rpc.transport.netty.client;
 
 import com.cat.rpc.codec.CommonDecoder;
 import com.cat.rpc.codec.CommonEncoder;
+import com.cat.rpc.codec.ProtocolFrameDecoder;
 import com.cat.rpc.serializer.CommonSerializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -46,7 +47,8 @@ public class ChannelProvider {
             protected void initChannel(SocketChannel ch) {
                 ChannelPipeline pipeline = ch.pipeline();
                 // 如果5s内没有向服务端写数据，会触发一个 IdleState#WRITER_IDLE 事件，该事件在 NettyClientHandler 中被处理:
-                pipeline.addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+                pipeline.addLast(new IdleStateHandler(0, 20, 0, TimeUnit.SECONDS));
+                pipeline.addLast(new ProtocolFrameDecoder());
                 pipeline.addLast(new CommonEncoder(serializer));
                 pipeline.addLast(new CommonDecoder());
                 pipeline.addLast(new NettyClientHandler());
