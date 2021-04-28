@@ -1,9 +1,9 @@
 package com.cat.rpc.loadbalancer;
 
-import com.alibaba.nacos.api.naming.pojo.Instance;
+import com.cat.rpc.entity.RpcInstance;
 
 import java.util.List;
 
 public interface LoadBalancer {
-    Instance select(List<Instance> instances);
+    RpcInstance select(List<RpcInstance> instances);
 }

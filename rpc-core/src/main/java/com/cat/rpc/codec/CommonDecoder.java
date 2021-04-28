@@ -8,7 +8,7 @@ import com.cat.rpc.exception.RpcException;
 import com.cat.rpc.serializer.CommonSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ReplayingDecoder;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 消息入站时调用decode将ByteBuf转为目标类型。
  */
-public class CommonDecoder extends ReplayingDecoder {
+public class CommonDecoder extends ByteToMessageDecoder {
     private static final Logger logger = LoggerFactory.getLogger(CommonDecoder.class);
     private static final int MAGIC_NUMBER = 0xCAFEBABE;
 

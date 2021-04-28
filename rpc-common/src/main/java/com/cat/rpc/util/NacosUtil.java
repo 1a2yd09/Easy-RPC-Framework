@@ -42,6 +42,7 @@ public class NacosUtil {
      */
     public static void registerService(String serviceName, InetSocketAddress address) throws NacosException {
         namingService.registerInstance(serviceName, address.getHostName(), address.getPort());
+        // 本项目中，多个服务端是以多进程的方式运行，因此之间不存在变量共享问题:
         NacosUtil.address = address;
         serviceNames.add(serviceName);
     }

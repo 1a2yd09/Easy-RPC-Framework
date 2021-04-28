@@ -32,7 +32,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponse>
     protected void channelRead0(ChannelHandlerContext ctx, RpcResponse msg) {
         try {
             logger.info(String.format("客户端接收到消息: %s", msg));
-            // 客户端将接收到的响应对象放到请求对象对应的 future 容器中:
+            // 客户端将接收到的响应对象与请求对象 ID 一致的 future 容器中:
             unprocessedRequests.complete(msg);
         } finally {
             ReferenceCountUtil.release(msg);
@@ -52,6 +52,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponse>
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.WRITER_IDLE) {
                 logger.info("发送心跳包 [{}]", ctx.channel().remoteAddress());
+                // 发送心跳包所使用的序列化器是默认的 KRYO 序列化器:
                 Channel channel = ChannelProvider.get((InetSocketAddress) ctx.channel().remoteAddress(), CommonSerializer.getByCode(CommonSerializer.DEFAULT_SERIALIZER));
                 RpcRequest rpcRequest = new RpcRequest();
                 rpcRequest.setHeartBeat(true);

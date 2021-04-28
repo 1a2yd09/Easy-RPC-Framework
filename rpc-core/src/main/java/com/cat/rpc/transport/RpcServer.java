@@ -1,5 +1,6 @@
 package com.cat.rpc.transport;
 
+import com.cat.rpc.registry.ServiceRegistry;
 import com.cat.rpc.serializer.CommonSerializer;
 
 /**
@@ -7,6 +8,7 @@ import com.cat.rpc.serializer.CommonSerializer;
  */
 public interface RpcServer {
     int DEFAULT_SERIALIZER = CommonSerializer.KRYO_SERIALIZER;
+    int DEFAULT_REGISTRY = ServiceRegistry.NACOS_REGISTRY;
 
     void start();
 

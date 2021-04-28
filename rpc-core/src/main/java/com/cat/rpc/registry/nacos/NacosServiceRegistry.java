@@ -1,8 +1,9 @@
-package com.cat.rpc.registry;
+package com.cat.rpc.registry.nacos;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.cat.rpc.enumeration.RpcError;
 import com.cat.rpc.exception.RpcException;
+import com.cat.rpc.registry.ServiceRegistry;
 import com.cat.rpc.util.NacosUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

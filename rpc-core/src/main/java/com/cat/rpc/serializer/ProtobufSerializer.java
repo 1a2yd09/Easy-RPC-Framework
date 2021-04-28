@@ -46,8 +46,7 @@ public class ProtobufSerializer implements CommonSerializer {
     private Schema getSchema(Class clazz) {
         Schema schema = schemaCache.get(clazz);
         if (Objects.isNull(schema)) {
-            // 这个schema通过RuntimeSchema进行懒创建并缓存
-            // 所以可以一直调用RuntimeSchema.getSchema(),这个方法是线程安全的
+            // schema通过RuntimeSchema懒创建并缓存，所以可以一直调用RuntimeSchema.getSchema()，这个方法是线程安全的:
             schema = RuntimeSchema.getSchema(clazz);
             if (Objects.nonNull(schema)) {
                 schemaCache.put(clazz, schema);

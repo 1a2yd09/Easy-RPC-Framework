@@ -27,7 +27,7 @@ public class RpcClientProxy implements InvocationHandler {
     }
 
     /**
-     * 获取服务接口的代理对象，使用代理对象的目的是为了封装复杂的请求对象构建以及请求发送流程，使客户端使用服务时简单易用。
+     * 获取服务接口的代理对象，使用代理对象的目的是为了封装复杂的请求对象构建以及请求发送流程，令客户端无感知地使用远程服务。
      */
     @SuppressWarnings("unchecked")
     public <T> T getProxy(Class<T> clazz) {

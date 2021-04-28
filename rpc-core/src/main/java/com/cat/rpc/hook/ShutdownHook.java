@@ -2,6 +2,7 @@ package com.cat.rpc.hook;
 
 import com.cat.rpc.factory.ThreadPoolFactory;
 import com.cat.rpc.util.NacosUtil;
+import com.cat.rpc.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ public class ShutdownHook {
         logger.info("关闭后将自动注销所有服务");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             NacosUtil.clearRegistry();
+            RedisUtil.clearRegistry();
             ThreadPoolFactory.shutDownAll();
         }));
     }

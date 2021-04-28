@@ -4,7 +4,7 @@ import com.cat.rpc.factory.ThreadPoolFactory;
 import com.cat.rpc.handler.RequestHandler;
 import com.cat.rpc.hook.ShutdownHook;
 import com.cat.rpc.provider.ServiceProviderImpl;
-import com.cat.rpc.registry.NacosServiceRegistry;
+import com.cat.rpc.registry.ServiceRegistry;
 import com.cat.rpc.serializer.CommonSerializer;
 import com.cat.rpc.transport.AbstractRpcServer;
 
@@ -20,15 +20,15 @@ public class SocketServer extends AbstractRpcServer {
     private final RequestHandler requestHandler = new RequestHandler();
 
     public SocketServer(String host, int port) {
-        this(host, port, DEFAULT_SERIALIZER);
+        this(host, port, DEFAULT_SERIALIZER, DEFAULT_REGISTRY);
     }
 
-    public SocketServer(String host, int port, Integer serializer) {
+    public SocketServer(String host, int port, Integer serializer, Integer registry) {
         this.host = host;
         this.port = port;
         this.serializer = CommonSerializer.getByCode(serializer);
         threadPool = ThreadPoolFactory.createDefaultThreadPool("socket-rpc-server");
-        this.serviceRegistry = new NacosServiceRegistry();
+        this.serviceRegistry = ServiceRegistry.getByCode(registry);
         this.serviceProvider = new ServiceProviderImpl();
         scanServices();
     }

@@ -13,6 +13,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class ReflectUtil {
+    /**
+     * 获取启动类类名。原理是借助方法调用栈，启动类一定位于调用栈的最底部。
+     */
     public static String getStackTrace() {
         StackTraceElement[] stack = new Throwable().getStackTrace();
         return stack[stack.length - 1].getClassName();

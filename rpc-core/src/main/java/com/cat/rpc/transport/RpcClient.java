@@ -1,6 +1,7 @@
 package com.cat.rpc.transport;
 
 import com.cat.rpc.entity.RpcRequest;
+import com.cat.rpc.registry.ServiceDiscovery;
 import com.cat.rpc.serializer.CommonSerializer;
 
 /**
@@ -8,6 +9,7 @@ import com.cat.rpc.serializer.CommonSerializer;
  */
 public interface RpcClient {
     int DEFAULT_SERIALIZER = CommonSerializer.KRYO_SERIALIZER;
+    int DEFAULT_DISCOVERY = ServiceDiscovery.NACOS_DISCOVERY;
 
     Object sendRequest(RpcRequest rpcRequest);
 }

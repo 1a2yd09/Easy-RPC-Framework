@@ -7,7 +7,6 @@ import com.cat.rpc.exception.RpcException;
 import com.cat.rpc.factory.SingletonFactory;
 import com.cat.rpc.loadbalancer.LoadBalancer;
 import com.cat.rpc.loadbalancer.RandomLoadBalancer;
-import com.cat.rpc.registry.NacosServiceDiscovery;
 import com.cat.rpc.registry.ServiceDiscovery;
 import com.cat.rpc.serializer.CommonSerializer;
 import com.cat.rpc.transport.RpcClient;
@@ -41,19 +40,19 @@ public class NettyClient implements RpcClient {
     private final UnprocessedRequests unprocessedRequests;
 
     public NettyClient() {
-        this(DEFAULT_SERIALIZER, new RandomLoadBalancer());
+        this(DEFAULT_SERIALIZER, DEFAULT_DISCOVERY, new RandomLoadBalancer());
     }
 
     public NettyClient(LoadBalancer loadBalancer) {
-        this(DEFAULT_SERIALIZER, loadBalancer);
+        this(DEFAULT_SERIALIZER, DEFAULT_DISCOVERY, loadBalancer);
     }
 
-    public NettyClient(Integer serializer) {
-        this(serializer, new RandomLoadBalancer());
+    public NettyClient(Integer serializer, Integer discovery) {
+        this(serializer, discovery, new RandomLoadBalancer());
     }
 
-    public NettyClient(Integer serializer, LoadBalancer loadBalancer) {
-        this.serviceDiscovery = new NacosServiceDiscovery(loadBalancer);
+    public NettyClient(Integer serializer, Integer discovery, LoadBalancer loadBalancer) {
+        this.serviceDiscovery = ServiceDiscovery.getByCode(discovery, loadBalancer);
         this.serializer = CommonSerializer.getByCode(serializer);
         this.unprocessedRequests = SingletonFactory.getInstance(UnprocessedRequests.class);
     }
@@ -64,7 +63,7 @@ public class NettyClient implements RpcClient {
             logger.error("未设置序列化器");
             throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
         }
-        // 为每一个请求对象准备一个 CompletableFuture 对象，用于接收返回结果:
+        // 为每一个请求对象准备一个 CompletableFuture 对象，用于接收 ID 一致的响应对象:
         CompletableFuture<RpcResponse> resultFuture = new CompletableFuture<>();
         try {
             InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest.getInterfaceName());
@@ -77,7 +76,7 @@ public class NettyClient implements RpcClient {
             // 向服务端发送请求对象，writeAndFlush 是异步操作，因此调用线程直接执行到最后返回 future 对象:
             channel.writeAndFlush(rpcRequest).addListener((ChannelFutureListener) future1 -> {
                 if (future1.isSuccess()) {
-                    logger.info(String.format("客户端发送消息: %s", rpcRequest.toString()));
+                    logger.info(String.format("客户端发送消息: %s", rpcRequest));
                 } else {
                     future1.channel().close();
                     // 发送失败，将异常对象放入到结果中，后续获取 future 结果时将返回该异常对象:

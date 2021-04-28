@@ -1,6 +1,6 @@
 package com.cat.rpc.loadbalancer;
 
-import com.alibaba.nacos.api.naming.pojo.Instance;
+import com.cat.rpc.entity.RpcInstance;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
     private int index = 0;
 
     @Override
-    public Instance select(List<Instance> instances) {
+    public RpcInstance select(List<RpcInstance> instances) {
         if (this.index >= instances.size()) {
             this.index %= instances.size();
         }

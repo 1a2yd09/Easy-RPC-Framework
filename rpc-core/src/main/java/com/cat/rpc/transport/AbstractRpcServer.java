@@ -36,13 +36,13 @@ public abstract class AbstractRpcServer implements RpcServer {
             throw new RpcException(RpcError.UNKNOWN_ERROR);
         }
         String basePackage = startClass.getAnnotation(ServiceScan.class).value();
+        // 如果没有指定包路径，则默认以启动类所在包及其子包作为服务实现类的目录:
         if ("".equals(basePackage)) {
             basePackage = mainClassName.substring(0, mainClassName.lastIndexOf("."));
         }
         Set<Class<?>> classSet = ReflectUtil.getClasses(basePackage);
         for (Class<?> clazz : classSet) {
             if (clazz.isAnnotationPresent(Service.class)) {
-                String serviceName = clazz.getAnnotation(Service.class).name();
                 Object obj;
                 try {
                     obj = clazz.newInstance();
@@ -50,6 +50,8 @@ public abstract class AbstractRpcServer implements RpcServer {
                     logger.error("创建 {} 时有错误发生", clazz);
                     continue;
                 }
+                String serviceName = clazz.getAnnotation(Service.class).name();
+                // 如果没有指定服务名称，则默认以服务实现类的父类接口完整类名作为服务名称:
                 if ("".equals(serviceName)) {
                     Class<?>[] interfaces = clazz.getInterfaces();
                     for (Class<?> oneInterface : interfaces) {

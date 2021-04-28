@@ -33,7 +33,6 @@ public class SocketRequestHandlerThread implements Runnable {
              OutputStream outputStream = socket.getOutputStream()) {
             RpcRequest rpcRequest = (RpcRequest) ObjectReader.readObject(inputStream);
             Object result = requestHandler.handle(rpcRequest);
-            // TODO: 反射调用出现异常将返回错误响应消息，此处又将其封装为正确响应消息。
             RpcResponse<Object> response = RpcResponse.success(result, rpcRequest.getRequestId());
             ObjectWriter.writeObject(outputStream, response, serializer);
         } catch (IOException e) {
