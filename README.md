@@ -1,10 +1,13 @@
-# My-RPC-Framework
+# Easy-RPC-Framework
 
-My-RPC-Framework 是一款基于 Nacos 实现的 RPC 框架。网络传输实现了基于 Java 原生 Socket 与 Netty 版本，并且实现了多种序列化与负载均衡算法。
+Easy-RPC-Framework 是一款基于 Nacos 实现的 RPC 框架。网络传输实现了基于 Java 原生 Socket 与 Netty 版本，并且实现了多种序列化与负载均衡算法。
 
 ## 架构
 
-![系统架构](./images/architecture.png)
+<div style="text-align: center;">
+
+![系统架构](./images/RPC.png)
+</div>
 
 消费者调用提供者的方式取决于消费者的客户端选择，如选用原生 Socket 则该步调用使用 BIO，如选用 Netty 方式则该步调用使用 NIO。如该调用有返回值，则提供者向消费者发送返回值的方式同理。
 
@@ -13,7 +16,7 @@ My-RPC-Framework 是一款基于 Nacos 实现的 RPC 框架。网络传输实现
 - 实现了基于 Java 原生 Socket 传输与 Netty 传输两种网络传输方式
 - 实现了四种序列化算法，Json 方式、Kryo 算法、Hessian 算法与 Google Protobuf 方式（默认采用 Kryo方式序列化）
 - 实现了两种负载均衡算法：随机算法与轮询算法
-- 使用 Nacos 作为注册中心，管理服务提供者信息
+- 使用 Nacos 或 Redis 作为注册中心，管理服务提供者信息
 - 消费端如采用 Netty 方式，会复用 Channel 避免多次连接
 - 如消费端和提供者都采用 Netty 方式，会采用 Netty 的心跳机制，保证连接可用
 - 接口抽象良好，模块耦合度低，网络传输、序列化器、负载均衡算法可扩展
@@ -28,9 +31,9 @@ My-RPC-Framework 是一款基于 Nacos 实现的 RPC 框架。网络传输实现
 - test-client —— 测试用消费侧
 - test-server —— 测试用提供侧
 
-## 传输协议（MRF协议）
+## 传输协议（ERF协议）
 
-调用参数与返回值的传输采用了如下 MRF 协议（ My-RPC-Framework 首字母）以防止粘包：
+调用参数与返回值的传输采用了如下 ERF 协议（ Easy-RPC-Framework 首字母）以防止粘包：
 
 ```text
 +---------------+---------------+-----------------+-------------+
@@ -80,20 +83,20 @@ public class HelloServiceImpl implements HelloService {
 @ServiceScan
 public class NettyTestServer {
     public static void main(String[] args) {
-        RpcServer server = new NettyServer("127.0.0.1", 9999, CommonSerializer.PROTOBUF_SERIALIZER);
+        RpcServer server = new NettyServer("127.0.0.1", 9999, CommonSerializer.PROTOBUF_SERIALIZER, ServiceRegistry.NACOS_REGISTRY);
         server.start();
     }
 }
 ```
 
-这里选用 Netty 传输方式，并且指定序列化方式为 Google Protobuf 方式。
+这里选用 Netty 传输方式，序列化方式为 Google Protobuf，并指定注册中心为 Nacos。
 
 ### 在服务消费侧远程调用
 
 ```java
 public class NettyTestClient {
     public static void main(String[] args) {
-        RpcClient client = new NettyClient(CommonSerializer.KRYO_SERIALIZER, new RoundRobinLoadBalancer());
+        RpcClient client = new NettyClient(CommonSerializer.KRYO_SERIALIZER, ServiceDiscovery.NACOS_DISCOVERY, new RoundRobinLoadBalancer());
         RpcClientProxy rpcClientProxy = new RpcClientProxy(client);
         HelloService helloService = rpcClientProxy.getProxy(HelloService.class);
         String res = helloService.hello("cat");
@@ -102,10 +105,8 @@ public class NettyTestClient {
 }
 ```
 
-这里选用了 Netty 的传输方式，序列化方式采用 Kryo 方式，负载均衡策略指定为轮询方式。
+这里选用 Netty 的传输方式，序列化方式为 Kryo 方式，并指定负载均衡策略为轮询方式。
 
 ### 启动
 
-首先启动服务提供者，再启动消费者，在此之前请确保 Nacos 运行在本地 8848 端口。
-
-## TODO
+使用 Nacos 为注册中心，首先启动服务提供者，再启动服务消费者，在此之前请确保 Nacos 运行在本地 8848 端口。
